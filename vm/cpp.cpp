@@ -66,23 +66,33 @@ void LFA() { uint32_t L = get(_latest); set(_latest,Cp); Ccell(L); }
 void AFA(uint8_t b) { Cbyte(b); }
 void NFA(char* s) { Cstring(s); }
 void CFA(string s) { SymTable[s] = Cp; set(_entry,Cp); }
+void Cheader(char*s) { LFA(); AFA(); NFA(s); CFA(s); }
 
 // ======================================================= bytecode interpreter
 
 void nop() { printf("nop"); }
 void bye() { printf("bye\n\n"); exit(0); }
 void jmp() { printf("jmp "); Ip=get(Ip); assert(Ip<=Cp); printf("%.4X",Ip); }
+void call() {
+	printf("call "); assert(Rp < Rsz); R[Rp++] = Ip+CELL;
+	Ip = get(Ip); assert(Ip <= Cp); }
 void ret() { printf("ret"); assert(Rp>0); Ip=R[--Rp]; assert(Ip<=Cp); }
+void lit() {
+	printf("lit "); assert(Dp < Dsz);
+	D[Dp++] = get(Ip); printf("%.4X", D[Dp - 1]);
+	Ip += CELL; assert(Ip <= Cp); }
 
 void VM() { for (;;) {
 	printf("%.4X ",Ip);
 	uint8_t op = M[Ip++]; assert(Ip<=Cp);	// FETCH
 	printf("%.2X ",op);
 	switch (op) {							// DECODE/EXECUTE
-		case opNOP:	nop(); break;
-		case opBYE:	bye(); break;
-		case opJMP: jmp(); break;
-		case opRET: ret(); break;
+		case opNOP : nop();  break;
+		case opBYE : bye();  break;
+		case opJMP : jmp();  break;
+		case opCALL: call(); break;
+		case opRET : ret();  break;
+		case opLIT : lit();  break;
 		default:
 			printf("bad opcode\n\n"); abort();
 	}

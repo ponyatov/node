@@ -8,6 +8,10 @@
 \:				{ return COLON; }
 \;				{ return SEMICOLON; }
 
+0x[0-9A-Fa-f]+	{ yylval.n = strtoul(yytext,NULL,0x10); return NUM; }
+
+const			{ return CONST; }
+
 nop				{ yylval.op = opNOP; return CMD0; }
 bye				{ yylval.op = opBYE; return CMD0; }
 

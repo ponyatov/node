@@ -33,6 +33,7 @@ extern void Ccell(uint32_t);	// compile cell
 extern void Cstring(char*);		// compile ASCIIZ string
 
 								// === compile vocabulary header for new word
+extern void Cheader(char*s);
 extern void LFA();				// Link Field Area pointer of previous word
 extern void AFA(uint8_t b=0);	// Attrubute Field Area (IMMEDIATE flag)
 extern void NFA(char*);			// Name Field Area (ASCIIZ string, word name)
