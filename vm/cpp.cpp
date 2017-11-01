@@ -4,14 +4,28 @@ void yyerror(string msg) { cout<<YYERR; cerr<<YYERR; exit(-1); }
 
 int main(int argc, char *argv[]) {
 	// compile vocabulary header
-	Cbyte(opJMP); Ccell(0);		// jmp _entry	jump to last defined word
-	Ccell(0);					// _latest		LFA of last defined word
+	Cbyte(opJMP); Ccell(0);			// jmp _entry	jump to last defined word
+	Ccell(0);						// _latest		LFA of last defined word
 	// run compiler
 	yyparse();
 	// dump memory
 	dump();
+	// run VM
+	VM();
 	return 0;
 }
+
+// ****************************************************** Virtual FORTH Machine
+
+// ===================================================================== stacks
+
+uint32_t R[Rsz];			// \ return stack
+uint32_t Rp;				// /
+
+ int32_t D[Dsz];			// \ data stack
+uint32_t Dp;				// /
+
+// ===================================================================== memory
 
 uint8_t M[Msz];			// memory
 uint32_t Ip=0;			// instruction pointer
@@ -32,6 +46,8 @@ uint32_t get(uint32_t addr) {
 		M[addr+2]<<0x10 | \
 		M[addr+3]<<0x18;	}
 
+// =================================================================== compiler
+
 void Cbyte( uint8_t b) { M[Cp++] = b; assert(Cp<Msz); }
 void Ccell(uint32_t b) { set(Cp,b); Cp+= CELL; assert(Cp<Msz); }
 void Cstring(char* s) {
@@ -44,11 +60,31 @@ void dump() {
 	fclose(img);
 }
 
+map<string,uint32_t> SymTable;								// symbol table
+
 void LFA() { uint32_t L = get(_latest); set(_latest,Cp); Ccell(L); }
-
 void AFA(uint8_t b) { Cbyte(b); }
-
 void NFA(char* s) { Cstring(s); }
-
-map<string,uint32_t> SymTable;
 void CFA(string s) { SymTable[s] = Cp; set(_entry,Cp); }
+
+// ======================================================= bytecode interpreter
+
+void nop() { printf("nop"); }
+void bye() { printf("bye\n\n"); exit(0); }
+void jmp() { printf("jmp "); Ip=get(Ip); assert(Ip<=Cp); printf("%.4X",Ip); }
+void ret() { printf("ret"); assert(Rp>0); Ip=R[--Rp]; assert(Ip<=Cp); }
+
+void VM() { for (;;) {
+	printf("%.4X ",Ip);
+	uint8_t op = M[Ip++]; assert(Ip<=Cp);	// FETCH
+	printf("%.2X ",op);
+	switch (op) {							// DECODE/EXECUTE
+		case opNOP:	nop(); break;
+		case opBYE:	bye(); break;
+		case opJMP: jmp(); break;
+		case opRET: ret(); break;
+		default:
+			printf("bad opcode\n\n"); abort();
+	}
+	printf("\n");
+}}

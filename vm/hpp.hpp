@@ -41,6 +41,12 @@ extern void PFA();				// Parameter Field Area (for var/const values)
 
 extern map<string,uint32_t> SymTable;	// compiler symbol table
 
+extern uint32_t R[Rsz];			// \ return stack
+extern uint32_t Rp;				// /
+
+extern  int32_t D[Dsz];			// \ data stack
+extern uint32_t Dp;				// /
+
 								// ==== bytecode commands ====
 #define opNOP	0x00	// nop
 #define opBYE	0xFF	// bye
@@ -49,6 +55,8 @@ extern map<string,uint32_t> SymTable;	// compiler symbol table
 #define opCALL	0x03	// call <addr>
 #define opRET	0x04	// ret
 #define opLIT	0x05	// lit <value>
+
+extern void VM();				// bytecode interpreter
 
 								// lexer/parser interface for bytecode compiler
 extern int yylex();

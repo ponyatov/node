@@ -1,11 +1,13 @@
 %{
 #include "hpp.hpp"
 %}
-%defines %union { char *s; }
+%defines %union { char *s; uint8_t op; }
 %token <s> SYM 
+%token <op> CMD0 CMD1
 %token COLON SEMICOLON
 %%
 REPL :
 REPL : REPL SYM			{ cout << $2 << endl; }
 REPL : REPL COLON SYM	{ LFA(); AFA(); NFA($3); CFA($3); }
 REPL : REPL SEMICOLON	{ Cbyte(opRET); }
+REPL : REPL CMD0		{ Cbyte($2); }
