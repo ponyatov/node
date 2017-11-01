@@ -1,5 +1,5 @@
 log.log: src.src ./exe.exe
-	./exe.exe < $< > $@ && tail $(TAIL) $@
+	./exe.exe < $< > $@ && hexdump -C bin.bin >> $@ ; tail $(TAIL) $@
 C = cpp.cpp ypp.tab.cpp lex.yy.c
 H = hpp.hpp ypp.tab.hpp
 CXXFLAGS += -std=gnu++11

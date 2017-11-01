@@ -1,3 +1,11 @@
 %{
-#include 
+#include "hpp.hpp"
 %}
+%defines %union { char *s; }
+%token <s> SYM 
+%token COLON SEMICOLON
+%%
+REPL :
+REPL : REPL SYM			{ cout << $2 << endl; }
+REPL : REPL COLON SYM	{ LFA(); AFA(); NFA($3); CFA($3); }
+REPL : REPL SEMICOLON	{ Cbyte(opRET); }

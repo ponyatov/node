@@ -1,0 +1,14 @@
+%{
+#include "hpp.hpp"
+%}
+%option noyywrap yylineno
+%%
+#[^\n]*			{}									// # comment
+
+\:				{ return COLON; }
+\;				{ return SEMICOLON; }
+
+[a-zA-Z0-9_]+	{ yylval.s = yytext; return SYM; }	// some symbol
+
+[ \t\r\n]+		{}									// drop spaces
+.				{yyerror("lexer");}					// undetected char
