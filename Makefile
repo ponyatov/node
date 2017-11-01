@@ -1,5 +1,5 @@
-all: emul
+all: vm
 
-emul: emul/log.log
-emul/log.log:
-	cd emul ; $(MAKE)
+emul: vm/bin.bin
+vm/bin.bin:
+	cd vm ; $(MAKE)
